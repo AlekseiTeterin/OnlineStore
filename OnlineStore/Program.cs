@@ -8,25 +8,36 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.WriteIndented = true;
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<ICatalog, InMemoryCatalog>();
+
 var app = builder.Build();
-Catalog catalog = new Catalog();
+
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.MapGet("/", () => "Hello World!");
-app.MapGet("/catalog", () =>
+
+app.MapGet("/catalog", (ICatalog catalog) =>
 {
-    
-    return catalog.Products;
+    var prods = catalog.GetProducts();
+    return prods;
 });
 
-app.MapPost("/catalog/add_product", (Product product, HttpContext context) => {
-    catalog.Products.Add(product);
+app.MapPost("/catalog/add_product", (ICatalog catalog, Product product, HttpContext context) => {
+    catalog.AddProduct(product);
+   
     context.Response.StatusCode = 201;
 });
 
-app.MapPost("/catalog/clear_catalog", () =>
+/*app.MapPost("/catalog/clear_catalog", () =>
 {
-    catalog.Products.Clear();
+    catalog.Products.Clear(); 
     Console.WriteLine("Successful cleaning");
-});
+});*/
 
 app.Run();
