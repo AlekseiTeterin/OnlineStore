@@ -34,10 +34,10 @@ app.MapPost("/catalog/add_product", (ICatalog catalog, Product product, HttpCont
     context.Response.StatusCode = 201;
 });
 
-/*app.MapPost("/catalog/clear_catalog", () =>
-{
-    catalog.Products.Clear(); 
-    Console.WriteLine("Successful cleaning");
-});*/
+app.MapPost("/catalog/delete_product", (ICatalog catalog, int id, HttpContext context) => {
+    catalog.DeleteProduct(id);
+
+    context.Response.StatusCode = 202;
+});
 
 app.Run();
